@@ -7,6 +7,8 @@ public class ClientView : MonoBehaviour
     private NetworkConnection _connection;
     private bool _isDone;
 
+    private NetworkEventableObject _networkEventableObject;
+
     private void Start()
     {
         _driver = NetworkDriver.Create();
@@ -16,11 +18,15 @@ public class ClientView : MonoBehaviour
         endpoint.Port = 3000;
 
         _connection = _driver.Connect(endpoint);
+
+        _networkEventableObject = new(_driver, _connection);
     }
 
     private void OnDestroy()
     {
         _driver.Dispose();
+
+        _networkEventableObject = null;
     }
 
     private void Update()
@@ -61,15 +67,6 @@ public class ClientView : MonoBehaviour
         }
     }
 
-    private void SendEvent(Event @event)
-    {
-        var jsonEvent = JsonUtility.ToJson(@event);
-
-        _driver.BeginSend(_connection, out var writer);
-        writer.WriteFixedString128(jsonEvent);
-        _driver.EndSend(writer);
-    }
-
     private void OnConnect()
     {
         var @event = new PlayerConnectEvent
@@ -79,7 +76,7 @@ public class ClientView : MonoBehaviour
             MyId = 1234
         };
 
-        SendEvent(@event);
+        _networkEventableObject.Send(@event);
     }
 
     private void OnDisconnect()
