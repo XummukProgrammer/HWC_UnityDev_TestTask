@@ -1,30 +1,29 @@
-using Unity.Networking.Transport;
 using UnityEngine;
 
 public class ClientView : MonoBehaviour
 {
-    private NetworkDriver _driver;
-    private NetworkConnection _connection;
-
+    private NetworkClient _networkClient;
     private ClientController _controller;
 
     private void Start()
     {
-        _driver = NetworkDriver.Create();
-        _connection = default(NetworkConnection);
+        _networkClient = new();
+        _networkClient.OnInit();
 
-        var endpoint = NetworkEndPoint.LoopbackIpv4;
-        endpoint.Port = 3000;
+        _networkClient.Connected += OnConnected;
+        _networkClient.DataGetted += OnDataGetted;
 
-        _connection = _driver.Connect(endpoint);
-
-        _controller = new(_driver, _connection);
+        _controller = new(_networkClient);
         _controller.OnInit();
     }
 
     private void OnDestroy()
     {
-        _driver.Dispose();
+        _networkClient.Connected -= OnConnected;
+        _networkClient.DataGetted -= OnDataGetted;
+
+        _networkClient.OnDeinit();
+        _networkClient = null;
 
         _controller.OnDeinit();
         _controller = null;
@@ -32,30 +31,16 @@ public class ClientView : MonoBehaviour
 
     private void Update()
     {
-        _driver.ScheduleUpdate().Complete();
+        _networkClient.OnUpdate();
+    }
 
-        if (!_connection.IsCreated)
-        {
-            return;
-        }
-        
-        DataStreamReader stream;
-        NetworkEvent.Type cmd;
-        while ((cmd = _connection.PopEvent(_driver, out stream)) != NetworkEvent.Type.Empty)
-        {
-            if (cmd == NetworkEvent.Type.Connect)
-            {
-                _controller.OnConnect();
-            }
-            else if (cmd == NetworkEvent.Type.Data)
-            {
-                var jsonEvent = stream.ReadFixedString128();
-                _controller.SendEvent(jsonEvent.ToString());
-            }
-            else if (cmd == NetworkEvent.Type.Disconnect)
-            {
-                _connection = default(NetworkConnection);
-            }
-        }
+    private void OnConnected()
+    {
+        _controller.OnConnect();
+    }
+
+    private void OnDataGetted(string jsonEvent)
+    {
+        _controller.SendEvent(jsonEvent);
     }
 }

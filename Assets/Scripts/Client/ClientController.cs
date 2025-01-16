@@ -1,25 +1,21 @@
-using Unity.Networking.Transport;
 using UnityEngine;
 
 public class ClientController
 {
-    private NetworkDriver _driver;
-    private NetworkConnection _connection;
-
+    private NetworkClient _networkClient;
     private NetworkEventableObject _networkEventableObject;
 
     private Events _events = new();
     private EventListener<TestEvent> _testListener;
 
-    public ClientController(NetworkDriver driver, NetworkConnection connection)
+    public ClientController(NetworkClient networkClient)
     {
-        _driver = driver;
-        _connection = connection;
+        _networkClient = networkClient;
     }
 
     public void OnInit()
     {
-        _networkEventableObject = new(_driver, _connection);
+        _networkEventableObject = new(_networkClient.Driver, _networkClient.Connection);
 
         _testListener = new EventListener<TestEvent>
         {
