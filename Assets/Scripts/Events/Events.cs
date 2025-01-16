@@ -8,7 +8,7 @@ public class Events
 
     public Events()
     {
-        AddAction<PlayerConnectEvent>("PlayerConnectEvent");
+        AddAction<PlayerConnectEvent>();
     }
 
     public void AddListener(IBaseEventListener listener)
@@ -32,15 +32,15 @@ public class Events
         }
     }
 
-    private void AddAction<T>(string id) where T : Event
+    private void AddAction<T>() where T : Event
     {
-        _actions[id] = (jsonEvent) =>
+        _actions[typeof(T).Name] = (jsonEvent) =>
         {
             var castedEvent = JsonUtility.FromJson<T>(jsonEvent);
 
             foreach (var listener in _listeners)
             {
-                if (listener is IEventListener<T> castedListener)
+                if (listener is EventListener<T> castedListener)
                 {
                     castedListener.Accept(castedEvent);
                 }

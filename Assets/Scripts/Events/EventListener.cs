@@ -2,7 +2,12 @@ public interface IBaseEventListener
 {
 }
 
-public interface IEventListener<T> : IBaseEventListener where T : Event
+public class EventListener<T> : IBaseEventListener where T : Event
 {
-    public void Accept(T @event);
+    public System.Action<T> Accepted;
+
+    public void Accept(T @event)
+    {
+        Accepted?.Invoke(@event);
+    }
 }
