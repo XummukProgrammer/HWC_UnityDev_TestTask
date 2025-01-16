@@ -1,8 +1,19 @@
 using UnityEngine;
 
+internal class PlayerConnectEventListener : IEventListener<PlayerConnectEvent>
+{
+    public void Accept(PlayerConnectEvent @event)
+    {
+        Debug.Log($"PLAYER CONNECT (MyId: {@event.MyId}, Name: {@event.Name})");
+    }
+}
+
 public class Server
 {
     private ServerData _data;
+    private PlayerConnectEventListener _playerConnectEventListener;
+
+    public Events Events { get; private set; } = new();
 
     public Server(ServerData data)
     {
@@ -11,18 +22,13 @@ public class Server
 
     public void Run()
     {
+        _playerConnectEventListener = new();
+        Events.AddListener(_playerConnectEventListener);
     }
 
     public void Stop()
     {
-    }
-
-    public void SendEvent(string jsonEvent)
-    {
-        var @event = JsonUtility.FromJson<Event>(jsonEvent);
-        if (@event.Id == "PlayerConnectEvent")
-        {
-            var ev = JsonUtility.FromJson<PlayerConnectEvent>(jsonEvent);
-        }
+        Events.RemoveListener(_playerConnectEventListener);
+        _playerConnectEventListener = null;
     }
 }

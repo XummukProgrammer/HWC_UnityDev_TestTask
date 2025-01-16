@@ -27,7 +27,7 @@ public class Client
 
     public void SendEvent(Event @event)
     {
-        var jsonEvent = JsonUtility.ToJson(@event, false);
-        _data.Server.SendEvent(jsonEvent);
+        var jsonEvent = JsonUtility.ToJson(@event);
+        _data.Server.Events.Send(jsonEvent);
     }
 }
