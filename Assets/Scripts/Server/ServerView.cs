@@ -85,8 +85,6 @@ public class ServerView : MonoBehaviour
                 if (cmd == NetworkEvent.Type.Data)
                 {
                     var jsonEvent = stream.ReadFixedString128();
-                    //Debug.Log($"Event: {jsonEvent}");
-
                     _events.Send(jsonEvent.ToString());
                 }
                 else if (cmd == NetworkEvent.Type.Disconnect)
@@ -94,6 +92,21 @@ public class ServerView : MonoBehaviour
                     Debug.Log("Client disconnected from server");
                     _connections[i] = default(NetworkConnection);
                 }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            foreach (var connection in _connections)
+            {
+                var @event = new TestEvent
+                {
+                    Id = "TestEvent",
+                    Message = "Hello, World!"
+                };
+
+                var networkEventableObject = new NetworkEventableObject(_driver, connection);
+                networkEventableObject.Send(@event);
             }
         }
     }

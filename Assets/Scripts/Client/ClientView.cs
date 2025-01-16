@@ -9,6 +9,9 @@ public class ClientView : MonoBehaviour
 
     private NetworkEventableObject _networkEventableObject;
 
+    private Events _events = new();
+    private EventListener<TestEvent> _testListener;
+
     private void Start()
     {
         _driver = NetworkDriver.Create();
@@ -20,6 +23,15 @@ public class ClientView : MonoBehaviour
         _connection = _driver.Connect(endpoint);
 
         _networkEventableObject = new(_driver, _connection);
+
+        _testListener = new EventListener<TestEvent>
+        {
+            Accepted = (@event) =>
+            {
+                Debug.Log($"MESSAGE: {@event.Message}");
+            }
+        };
+        _events.AddListener(_testListener);
     }
 
     private void OnDestroy()
@@ -27,6 +39,9 @@ public class ClientView : MonoBehaviour
         _driver.Dispose();
 
         _networkEventableObject = null;
+
+        _events.RemoveListener(_testListener);
+        _testListener = null;
     }
 
     private void Update()
@@ -52,11 +67,8 @@ public class ClientView : MonoBehaviour
             }
             else if (cmd == NetworkEvent.Type.Data)
             {
-                /*uint value = stream.ReadUInt();
-                Debug.Log("Got the value = " + value + " back from the server");
-                _isDone = true;
-                _connection.Disconnect(_driver);
-                _connection = default(NetworkConnection);*/
+                var jsonEvent = stream.ReadFixedString128();
+                _events.Send(jsonEvent.ToString());
             }
             else if (cmd == NetworkEvent.Type.Disconnect)
             {

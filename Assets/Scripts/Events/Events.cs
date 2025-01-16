@@ -9,6 +9,7 @@ public class Events
     public Events()
     {
         AddAction<PlayerConnectEvent>();
+        AddAction<TestEvent>();
     }
 
     public void AddListener(IBaseEventListener listener)
