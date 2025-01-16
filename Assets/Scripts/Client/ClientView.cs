@@ -5,12 +5,8 @@ public class ClientView : MonoBehaviour
 {
     private NetworkDriver _driver;
     private NetworkConnection _connection;
-    private bool _isDone;
 
-    private NetworkEventableObject _networkEventableObject;
-
-    private Events _events = new();
-    private EventListener<TestEvent> _testListener;
+    private ClientController _controller;
 
     private void Start()
     {
@@ -22,26 +18,16 @@ public class ClientView : MonoBehaviour
 
         _connection = _driver.Connect(endpoint);
 
-        _networkEventableObject = new(_driver, _connection);
-
-        _testListener = new EventListener<TestEvent>
-        {
-            Accepted = (@event) =>
-            {
-                Debug.Log($"MESSAGE: {@event.Message}");
-            }
-        };
-        _events.AddListener(_testListener);
+        _controller = new(_driver, _connection);
+        _controller.OnInit();
     }
 
     private void OnDestroy()
     {
         _driver.Dispose();
 
-        _networkEventableObject = null;
-
-        _events.RemoveListener(_testListener);
-        _testListener = null;
+        _controller.OnDeinit();
+        _controller = null;
     }
 
     private void Update()
@@ -50,10 +36,6 @@ public class ClientView : MonoBehaviour
 
         if (!_connection.IsCreated)
         {
-            if (!_isDone)
-            {
-                Debug.Log("Something went wrong during connect");
-            }
             return;
         }
         
@@ -63,35 +45,17 @@ public class ClientView : MonoBehaviour
         {
             if (cmd == NetworkEvent.Type.Connect)
             {
-                OnConnect();
+                _controller.OnConnect();
             }
             else if (cmd == NetworkEvent.Type.Data)
             {
                 var jsonEvent = stream.ReadFixedString128();
-                _events.Send(jsonEvent.ToString());
+                _controller.SendEvent(jsonEvent.ToString());
             }
             else if (cmd == NetworkEvent.Type.Disconnect)
             {
-                OnDisconnect();
-
                 _connection = default(NetworkConnection);
             }
         }
-    }
-
-    private void OnConnect()
-    {
-        var @event = new PlayerConnectEvent
-        {
-            Id = "PlayerConnectEvent",
-            Name = "Xummuk97",
-            MyId = 1234
-        };
-
-        _networkEventableObject.Send(@event);
-    }
-
-    private void OnDisconnect()
-    {
     }
 }
