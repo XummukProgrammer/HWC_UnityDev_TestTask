@@ -23,6 +23,18 @@ public static class Plugins
         _plugins.Remove(plugin);
     }
 
+    public static T Get<T>() where T : Plugin
+    {
+        foreach (var plugin in _plugins)
+        {
+            if (plugin is T castedPlugin)
+            {
+                return castedPlugin;
+            }
+        }
+        return null;
+    }
+
     public static void OnAllPluginsLoaded()
     {
         foreach (var plugin in _plugins)

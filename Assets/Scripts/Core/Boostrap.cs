@@ -18,7 +18,10 @@ public class Boostrap : MonoBehaviour
             Plugins.ServerController = serverView.Controller;
         }
 
+        Plugins.Add(new AuthPlugin());
+        Plugins.Add(new ServerClientsPlugin());
         Plugins.Add(new ChatPlugin());
+
         Plugins.OnAllPluginsLoaded();
     }
 

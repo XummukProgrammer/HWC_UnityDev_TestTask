@@ -52,11 +52,6 @@ public class ChatPlugin : Plugin
     public override void OnUpdate()
     {
         base.OnUpdate();
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            PrintToChatAll("Hello, World!");
-        }
     }
 
     public void PrintToChat(int[] slots, string message)
@@ -97,6 +92,13 @@ public class ChatPlugin : Plugin
     {
         foreach (var slot in @event.Slots)
         {
+            var client = ServerController.Clients[slot];
+
+            if (client == null || !client.IsCreate)
+            {
+                continue;
+            }
+
             ServerController.Clients[slot].SendNetworkEvent(new PlayerChatEvent
             {
                 Message = @event.Message

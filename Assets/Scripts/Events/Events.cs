@@ -8,6 +8,8 @@ public static class EventsActions
     public static void Init()
     {
         AddAction<PlayerChatEvent>();
+        AddAction<PlayerFullConnectedEvent>();
+        AddAction<PlayerAcceptedEvent>();
     }
 
     public static void AddAction<T>() where T : Event

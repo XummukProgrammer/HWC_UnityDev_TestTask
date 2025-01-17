@@ -3,7 +3,13 @@ public class ClientController
     private NetworkClient _networkClient;
     private NetworkEventableObject _networkEventableObject;
 
+    public int Slot { get; set; }
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public int UID { get; set; }
     public Events Events { get; private set; } = new();
+
+    public event System.Action Connected;
 
     public ClientController(NetworkClient networkClient)
     {
@@ -22,6 +28,7 @@ public class ClientController
 
     public void OnConnect()
     {
+        Connected?.Invoke();
     }
 
     public void FireEvent(string jsonEvent)

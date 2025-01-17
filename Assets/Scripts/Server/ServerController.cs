@@ -7,6 +7,7 @@ public class ServerController
     private NetworkServer _networkServer;
     private int _connectedClients;
     private Dictionary<int, bool> _openSlots;
+    private int _userId;
 
     private EventListener<PlayerChatEvent> _chatListener;
 
@@ -21,6 +22,7 @@ public class ServerController
     public void OnInit()
     {
         _connectedClients = 0;
+        _userId = 0;
 
         Clients = new();
         _openSlots = new();
@@ -88,11 +90,22 @@ public class ServerController
         var (slot, hasSlot) = GetOpenSlot();
         if (hasSlot)
         {
-            Clients[slot].Slot = slot;
-            Clients[slot].Connect(connection);
+            var client = Clients[slot];
+
+            client.Slot = slot;
+            client.UserId = _userId;
+            client.Connect(connection);
             _connectedClients++;
             SetSlotValue(slot, false);
             Debug.Log("Accepted a connection");
+
+            client.SendNetworkEvent(new PlayerAcceptedEvent
+            {
+                Slot = slot,
+                UserId = _userId
+            });
+
+            _userId++;
         }
     }
 }

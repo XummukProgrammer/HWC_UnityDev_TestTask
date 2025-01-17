@@ -8,6 +8,9 @@ public class ServerClient
     public NetworkConnection Connection { get; private set; }
 
     public int Slot { get; set; }
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public int UID { get; set; }
     public bool IsCreate => Connection != null && Connection.IsCreated;
 
     public ServerClient(NetworkDriver driver)
@@ -25,6 +28,7 @@ public class ServerClient
     public void Disconnect()
     {
         Slot = -1;
+        UserId = 0;
         Connection = default(NetworkConnection);
 
         _networkEventableObject = null;
