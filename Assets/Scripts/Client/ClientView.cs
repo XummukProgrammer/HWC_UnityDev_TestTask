@@ -2,50 +2,45 @@ using UnityEngine;
 
 public class ClientView : MonoBehaviour
 {
-    private NetworkClient _networkClient;
-    private ClientController _controller;
+    public NetworkClient NetworkClient {  get; private set; }
+    public ClientController Controller { get; private set; }
 
-    private void Start()
+    private void Awake()
     {
-        _networkClient = new();
-        _networkClient.OnInit();
+        NetworkClient = new();
+        NetworkClient.OnInit();
 
-        _networkClient.Connected += OnConnected;
-        _networkClient.DataGetted += OnDataGetted;
+        NetworkClient.Connected += OnConnected;
+        NetworkClient.DataGetted += OnDataGetted;
 
-        _controller = new(_networkClient);
-        _controller.OnInit();
+        Controller = new(NetworkClient);
+        Controller.OnInit();
     }
 
     private void OnDestroy()
     {
-        _networkClient.Connected -= OnConnected;
-        _networkClient.DataGetted -= OnDataGetted;
+        NetworkClient.Connected -= OnConnected;
+        NetworkClient.DataGetted -= OnDataGetted;
 
-        _networkClient.OnDeinit();
-        _networkClient = null;
+        NetworkClient.OnDeinit();
+        NetworkClient = null;
 
-        _controller.OnDeinit();
-        _controller = null;
+        Controller.OnDeinit();
+        Controller = null;
     }
 
     private void Update()
     {
-        _networkClient.OnUpdate();
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            _controller.PrintToChatAll("Hello, World!");
-        }
+        NetworkClient.OnUpdate();
     }
 
     private void OnConnected()
     {
-        _controller.OnConnect();
+        Controller.OnConnect();
     }
 
     private void OnDataGetted(string jsonEvent)
     {
-        _controller.FireEvent(jsonEvent);
+        Controller.FireEvent(jsonEvent);
     }
 }

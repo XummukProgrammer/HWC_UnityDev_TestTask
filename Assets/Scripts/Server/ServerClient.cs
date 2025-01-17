@@ -30,17 +30,7 @@ public class ServerClient
         _networkEventableObject = null;
     }
 
-    public void PrintToChat(string message)
-    {
-        var @event = new PlayerChatEvent
-        {
-            Message = message
-        };
-
-        SendNetworkEvent(@event);
-    }
-
-    private void SendNetworkEvent<T>(T @event) where T : Event
+    public void SendNetworkEvent<T>(T @event) where T : Event
     {
         _networkEventableObject.Send(@event);
     }

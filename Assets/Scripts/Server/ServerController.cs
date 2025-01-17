@@ -5,12 +5,13 @@ using UnityEngine;
 public class ServerController
 {
     private NetworkServer _networkServer;
-    private List<ServerClient> _clients;
     private int _connectedClients;
     private Dictionary<int, bool> _openSlots;
 
-    private Events _events = new();
     private EventListener<PlayerChatEvent> _chatListener;
+
+    public List<ServerClient> Clients { get; private set; }
+    public Events Events { get; private set; } = new();
 
     public ServerController(NetworkServer networkServer)
     {
@@ -21,44 +22,26 @@ public class ServerController
     {
         _connectedClients = 0;
 
-        _clients = new();
+        Clients = new();
         _openSlots = new();
         for (int i = 0; i < 16; i++)
         {
-            _clients.Add(new ServerClient(_networkServer.Driver));
+            Clients.Add(new ServerClient(_networkServer.Driver));
             _openSlots[i] = true;
         }
 
         _networkServer.Accepted += OnAccepted;
-
-        _chatListener = new EventListener<PlayerChatEvent>
-        {
-            Accepted = (@event) =>
-            {
-                foreach (var slot in @event.Slots)
-                {
-                    if (_clients[slot].IsCreate)
-                    {
-                        _clients[slot].PrintToChat(@event.Message);
-                    }
-                }
-            }
-        };
-        _events.AddListener(_chatListener);
     }
 
     public void OnDeinit()
     {
         _networkServer.Accepted -= OnAccepted;
-
-        _events.RemoveListener(_chatListener);
-        _chatListener = null;
     }
 
     public void OnUpdate()
     {
         DataStreamReader stream;
-        foreach (var client in _clients)
+        foreach (var client in Clients)
         {
             if (!client.IsCreate)
             {
@@ -71,7 +54,7 @@ public class ServerController
                 if (cmd == NetworkEvent.Type.Data)
                 {
                     var jsonEvent = stream.ReadFixedString128();
-                    _events.Fire(jsonEvent.ToString());
+                    Events.Fire(jsonEvent.ToString());
                 }
                 else if (cmd == NetworkEvent.Type.Disconnect)
                 {
@@ -105,8 +88,8 @@ public class ServerController
         var (slot, hasSlot) = GetOpenSlot();
         if (hasSlot)
         {
-            _clients[_connectedClients].Slot = slot;
-            _clients[_connectedClients].Connect(connection);
+            Clients[slot].Slot = slot;
+            Clients[slot].Connect(connection);
             _connectedClients++;
             SetSlotValue(slot, false);
             Debug.Log("Accepted a connection");

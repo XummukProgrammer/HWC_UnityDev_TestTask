@@ -2,30 +2,30 @@ using UnityEngine;
 
 public class ServerView : MonoBehaviour
 {
-    private NetworkServer _networkServer;
-    private ServerController _controller;
-    
-    private void Start()
-    {
-        _networkServer = new();
-        _networkServer.OnInit();
+    public NetworkServer NetworkServer {  get; private set; }
+    public ServerController Controller { get; private set; }
 
-        _controller = new(_networkServer);
-        _controller.OnInit();
+    private void Awake()
+    {
+        NetworkServer = new();
+        NetworkServer.OnInit();
+
+        Controller = new(NetworkServer);
+        Controller.OnInit();
     }
 
     private void OnDestroy()
     {
-        _networkServer.OnDeinit();
-        _networkServer = null;
+        NetworkServer.OnDeinit();
+        NetworkServer = null;
 
-        _controller.OnDeinit();
-        _controller = null;
+        Controller.OnDeinit();
+        Controller = null;
     }
 
     private void Update()
     {
-        _networkServer.OnUpdate();
-        _controller.OnUpdate();
+        NetworkServer.OnUpdate();
+        Controller.OnUpdate();
     }
 }
