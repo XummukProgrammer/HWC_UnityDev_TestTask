@@ -83,6 +83,14 @@ public class ChatPlugin : Plugin
         PrintToChat(slots, message);
     }
 
+    public void PrintToMe(string message)
+    {
+        if (ClientController != null)
+        {
+            PrintToChat(ClientController.Slot, message);
+        }
+    }
+
     private void OnClientChatHandler(PlayerChatEvent @event)
     {
         Debug.Log(@event.Message);
