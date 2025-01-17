@@ -12,8 +12,10 @@ public class NetworkEventableObject
         _connection = connection;
     }
 
-    public void Send(Event @event)
+    public void Send<T>(T @event) where T : Event
     {
+        @event.Id = typeof(T).Name;
+
         var jsonEvent = JsonUtility.ToJson(@event);
 
         _driver.BeginSend(_connection, out var writer);

@@ -32,6 +32,11 @@ public class ClientView : MonoBehaviour
     private void Update()
     {
         _networkClient.OnUpdate();
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            _controller.PrintToChatAll("Hello, World!");
+        }
     }
 
     private void OnConnected()

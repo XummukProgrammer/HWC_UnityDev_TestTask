@@ -34,14 +34,13 @@ public class ServerClient
     {
         var @event = new PlayerChatEvent
         {
-            Id = "PlayerChatEvent",
             Message = message
         };
 
         SendNetworkEvent(@event);
     }
 
-    private void SendNetworkEvent(Event @event)
+    private void SendNetworkEvent<T>(T @event) where T : Event
     {
         _networkEventableObject.Send(@event);
     }

@@ -43,7 +43,6 @@ public class ClientController
     {
         var @event = new PlayerChatEvent
         {
-            Id = "PlayerChatEvent",
             Message = message,
             Slots = slots,
         };
@@ -72,7 +71,7 @@ public class ClientController
         _events.Fire(jsonEvent.ToString());
     }
 
-    private void SendNetworkEvent(Event @event)
+    private void SendNetworkEvent<T>(T @event) where T : Event
     {
         _networkEventableObject.Send(@event);
     }
