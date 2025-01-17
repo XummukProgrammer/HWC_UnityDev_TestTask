@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class Boostrap : MonoBehaviour
 {
-    private void Start()
+    private void Awake()
     {
         EventsActions.Init();
+    }
 
+    private void Start()
+    {
         var clientView = FindObjectOfType<ClientView>();
         if (clientView != null)
         {
@@ -21,6 +24,12 @@ public class Boostrap : MonoBehaviour
         Plugins.Add(new AuthPlugin());
         Plugins.Add(new ServerClientsPlugin());
         Plugins.Add(new ChatPlugin());
+        Plugins.Add(new ControllerPlugin());
+
+        if (Plugins.ServerController != null)
+        {
+            Plugins.Add(new AbilitiesPlugin());
+        }
 
         Plugins.OnAllPluginsLoaded();
     }

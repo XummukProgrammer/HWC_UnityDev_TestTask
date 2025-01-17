@@ -10,6 +10,7 @@ public static class EventsActions
         AddAction<PlayerChatEvent>();
         AddAction<PlayerFullConnectedEvent>();
         AddAction<PlayerAcceptedEvent>();
+        AddAction<PlayerButtonPressedEvent>();
     }
 
     public static void AddAction<T>() where T : Event
