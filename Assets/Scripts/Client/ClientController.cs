@@ -6,7 +6,7 @@ public class ClientController
     private NetworkEventableObject _networkEventableObject;
 
     private Events _events = new();
-    private EventListener<TestEvent> _testListener;
+    private EventListener<PlayerChatEvent> _chatListener;
 
     public ClientController(NetworkClient networkClient)
     {
@@ -17,38 +17,63 @@ public class ClientController
     {
         _networkEventableObject = new(_networkClient.Driver, _networkClient.Connection);
 
-        _testListener = new EventListener<TestEvent>
+        _chatListener = new EventListener<PlayerChatEvent>
         {
             Accepted = (@event) =>
             {
-                Debug.Log($"MESSAGE: {@event.Message}");
+                Debug.Log(@event.Message);
             }
         };
-        _events.AddListener(_testListener);
+        _events.AddListener(_chatListener);
     }
 
     public void OnDeinit()
     {
         _networkEventableObject = null;
 
-        _events.RemoveListener(_testListener);
-        _testListener = null;
+        _events.RemoveListener(_chatListener);
+        _chatListener = null;
     }
 
     public void OnConnect()
     {
-        var @event = new PlayerConnectEvent
-        {
-            Id = "PlayerConnectEvent",
-            Name = "Xummuk97",
-            MyId = 1234
-        };
-
-        _networkEventableObject.Send(@event);
     }
 
-    public void SendEvent(string jsonEvent)
+    public void PrintToChat(int[] slots, string message)
     {
-        _events.Send(jsonEvent.ToString());
+        var @event = new PlayerChatEvent
+        {
+            Id = "PlayerChatEvent",
+            Message = message,
+            Slots = slots,
+        };
+
+        SendNetworkEvent(@event);
+    }
+
+    public void PrintToChat(int slot, string message)
+    {
+        PrintToChat(new int[] { slot }, message);
+    }
+
+    public void PrintToChatAll(string message)
+    {
+        int[] slots = new int[16];
+        for (int i = 0; i < 16; i++)
+        {
+            slots[i] = i;
+        }
+
+        PrintToChat(slots, message);
+    }
+
+    public void FireEvent(string jsonEvent)
+    {
+        _events.Fire(jsonEvent.ToString());
+    }
+
+    private void SendNetworkEvent(Event @event)
+    {
+        _networkEventableObject.Send(@event);
     }
 }

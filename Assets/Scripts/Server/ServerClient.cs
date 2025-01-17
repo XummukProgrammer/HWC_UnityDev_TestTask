@@ -3,6 +3,7 @@ using Unity.Networking.Transport;
 public class ServerClient
 {
     private NetworkDriver _driver;
+    private NetworkEventableObject _networkEventableObject;
 
     public NetworkConnection Connection { get; private set; }
 
@@ -17,11 +18,31 @@ public class ServerClient
     public void Connect(NetworkConnection connection)
     {
         Connection = connection;
+
+        _networkEventableObject = new(_driver, Connection);
     }
 
     public void Disconnect()
     {
         Slot = -1;
         Connection = default(NetworkConnection);
+
+        _networkEventableObject = null;
+    }
+
+    public void PrintToChat(string message)
+    {
+        var @event = new PlayerChatEvent
+        {
+            Id = "PlayerChatEvent",
+            Message = message
+        };
+
+        SendNetworkEvent(@event);
+    }
+
+    private void SendNetworkEvent(Event @event)
+    {
+        _networkEventableObject.Send(@event);
     }
 }

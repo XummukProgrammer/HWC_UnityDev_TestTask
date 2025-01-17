@@ -8,8 +8,7 @@ public class Events
 
     public Events()
     {
-        AddAction<PlayerConnectEvent>();
-        AddAction<TestEvent>();
+        AddAction<PlayerChatEvent>();
     }
 
     public void AddListener(IBaseEventListener listener)
@@ -22,7 +21,7 @@ public class Events
         _listeners.Remove(listener);
     }
 
-    public void Send(string jsonEvent)
+    public void Fire(string jsonEvent)
     {
         var @event = JsonUtility.FromJson<Event>(jsonEvent);
         

@@ -41,6 +41,6 @@ public class ClientView : MonoBehaviour
 
     private void OnDataGetted(string jsonEvent)
     {
-        _controller.SendEvent(jsonEvent);
+        _controller.FireEvent(jsonEvent);
     }
 }

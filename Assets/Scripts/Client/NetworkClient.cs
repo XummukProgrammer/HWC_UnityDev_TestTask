@@ -1,4 +1,5 @@
 using Unity.Networking.Transport;
+using UnityEngine;
 
 public class NetworkClient
 {

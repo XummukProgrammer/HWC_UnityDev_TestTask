@@ -10,7 +10,7 @@ public class ServerController
     private Dictionary<int, bool> _openSlots;
 
     private Events _events = new();
-    private EventListener<PlayerConnectEvent> _playerConnectListener;
+    private EventListener<PlayerChatEvent> _chatListener;
 
     public ServerController(NetworkServer networkServer)
     {
@@ -31,22 +31,28 @@ public class ServerController
 
         _networkServer.Accepted += OnAccepted;
 
-        _playerConnectListener = new EventListener<PlayerConnectEvent>
+        _chatListener = new EventListener<PlayerChatEvent>
         {
             Accepted = (@event) =>
             {
-                Debug.Log($"PLAYER CONNECT (MyId: {@event.MyId}, Name: {@event.Name})");
+                foreach (var slot in @event.Slots)
+                {
+                    if (_clients[slot].IsCreate)
+                    {
+                        _clients[slot].PrintToChat(@event.Message);
+                    }
+                }
             }
         };
-        _events.AddListener(_playerConnectListener);
+        _events.AddListener(_chatListener);
     }
 
     public void OnDeinit()
     {
         _networkServer.Accepted -= OnAccepted;
 
-        _events.RemoveListener(_playerConnectListener);
-        _playerConnectListener = null;
+        _events.RemoveListener(_chatListener);
+        _chatListener = null;
     }
 
     public void OnUpdate()
@@ -65,7 +71,7 @@ public class ServerController
                 if (cmd == NetworkEvent.Type.Data)
                 {
                     var jsonEvent = stream.ReadFixedString128();
-                    _events.Send(jsonEvent.ToString());
+                    _events.Fire(jsonEvent.ToString());
                 }
                 else if (cmd == NetworkEvent.Type.Disconnect)
                 {
