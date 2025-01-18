@@ -86,7 +86,7 @@ public class EntitiesPlugin : Plugin
 
         if (_authPlugin != null)
         {
-            _authPlugin.ClientFullConnected -= OnClientFullConnectedHandler;
+            _authPlugin.ClientAccepted -= OnClientAcceptedHandler;
         }
     }
 
@@ -97,7 +97,7 @@ public class EntitiesPlugin : Plugin
         _authPlugin = Plugins.Get<AuthPlugin>();
         if (_authPlugin != null)
         {
-            _authPlugin.ClientFullConnected += OnClientFullConnectedHandler;
+            _authPlugin.ClientAccepted += OnClientAcceptedHandler;
         }
     }
 
@@ -187,11 +187,11 @@ public class EntitiesPlugin : Plugin
         }
     }
 
-    private void OnClientFullConnectedHandler(ServerClient client)
+    private void OnClientAcceptedHandler()
     {
-        client.SendNetworkEvent(new PlayerPullEntitiesEvent
+        ClientController.SendNetworkEvent(new PlayerPullEntitiesEvent
         {
-            UserId = client.UserId
+            UserId = ClientController.UserId
         });
 
         CreateClientEntity(Vector3.zero, "ClientEntity");

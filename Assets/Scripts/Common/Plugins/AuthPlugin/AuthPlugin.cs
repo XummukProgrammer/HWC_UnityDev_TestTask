@@ -12,6 +12,7 @@ public class AuthPlugin : Plugin
     private EventListener<PlayerFullConnectedEvent> _serverFullConnectedListener;
 
     public event System.Action<ServerClient> ClientFullConnected;
+    public event System.Action ClientAccepted;
 
     public override void OnLoad()
     {
@@ -75,6 +76,8 @@ public class AuthPlugin : Plugin
             UserId = @event.UserId,
             Slot = @event.Slot
         });
+
+        ClientAccepted?.Invoke();
     }
 
     private void OnPlayerFullConnectedHandler(PlayerFullConnectedEvent @event)

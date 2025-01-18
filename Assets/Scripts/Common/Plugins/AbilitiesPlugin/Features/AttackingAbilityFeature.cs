@@ -10,9 +10,6 @@ public class AttackingAbilityFeature : IAbilityFeature
     public void OnInit()
     {
         _chatPlugin = Plugins.Get<ChatPlugin>();
-
-        _model = AssetDatabase.LoadAssetAtPath<AttackingAbilityModel>("Assets/Models/Abilities/Attacking.asset");
-        var i = 0;
     }
 
     public void OnActivate(ServerClient client)
