@@ -4,13 +4,13 @@ using UnityEngine;
 public static class Entities
 {
     private static EntitiesContainerView _containerView;
-    private static List<ServerEntity> _serverEntities;
+    private static List<ServerEntity> _serverEntities = new();
+
+    public static IEnumerator<ServerEntity> ServerEntities = _serverEntities.GetEnumerator();
 
     public static void Init()
     {
         _containerView = GameObject.FindObjectOfType<EntitiesContainerView>();
-
-        _serverEntities = new();
     }
 
     public static void CreateClientEntity(int entityId, Vector3 position, string prefabId)

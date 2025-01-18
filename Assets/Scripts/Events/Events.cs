@@ -14,6 +14,7 @@ public static class EventsActions
         AddAction<PlayerCreateEntityEvent>();
         AddAction<CreateEntityEvent>();
         AddAction<UpdateEntityPositionEvent>();
+        AddAction<PlayerPullEntitiesEvent>();
     }
 
     public static void AddAction<T>() where T : Event

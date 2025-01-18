@@ -11,6 +11,7 @@ public class EntitiesPlugin : Plugin
     private AuthPlugin _authPlugin;
 
     private EventListener<PlayerCreateEntityEvent> _playerCreateEntityListener;
+    private EventListener<PlayerPullEntitiesEvent> _playerPullEntitiesListener;
     private EventListener<CreateEntityEvent> _createEntityListener;
     private EventListener<UpdateEntityPositionEvent> _serverUpdateEntityPositionListener;
     private EventListener<UpdateEntityPositionEvent> _clientUpdateEntityPositionListener;
@@ -34,6 +35,12 @@ public class EntitiesPlugin : Plugin
                 Accepted = OnUpdateServerEntityPositionHandler
             };
             ServerController.Events.AddListener(_serverUpdateEntityPositionListener);
+
+            _playerPullEntitiesListener = new EventListener<PlayerPullEntitiesEvent>
+            {
+                Accepted = OnPlayerPullEntitiesHandler
+            };
+            ServerController.Events.AddListener(_playerPullEntitiesListener);
         }
 
         if (ClientController != null)
@@ -66,6 +73,9 @@ public class EntitiesPlugin : Plugin
 
             ClientController.Events.RemoveListener(_clientUpdateEntityPositionListener);
             _clientUpdateEntityPositionListener = null;
+
+            ServerController.Events.RemoveListener(_playerPullEntitiesListener);
+            _playerPullEntitiesListener = null;
         }
 
         if (ClientController != null)
@@ -179,6 +189,35 @@ public class EntitiesPlugin : Plugin
 
     private void OnClientFullConnectedHandler(ServerClient client)
     {
+        client.SendNetworkEvent(new PlayerPullEntitiesEvent
+        {
+            UserId = client.UserId
+        });
+
         CreateClientEntity(Vector3.zero, "ClientEntity");
+    }
+
+    private void OnPlayerPullEntitiesHandler(PlayerPullEntitiesEvent @event)
+    {
+        foreach (var client in ServerController.Clients)
+        {
+            if (!client.IsCreate || client.UserId != @event.UserId)
+            {
+                continue;
+            }
+
+            var entities = Entities.ServerEntities;
+            while (entities.MoveNext())
+            {
+                var entity = entities.Current;
+                client.SendNetworkEvent(new CreateEntityEvent
+                {
+                    EntityId = entity.EntityId,
+                    Position = entity.Position,
+                    PrefabId = entity.PrefabId
+                });
+            }    
+            return;
+        }
     }
 }
