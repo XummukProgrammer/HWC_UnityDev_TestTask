@@ -9,6 +9,7 @@ public class EntitiesPlugin : Plugin
     private int _entityId;
 
     private AuthPlugin _authPlugin;
+    private SpawnsPlugin _spawnsPlugin;
 
     private EventListener<PlayerCreateEntityEvent> _playerCreateEntityListener;
     private EventListener<PlayerPullEntitiesEvent> _playerPullEntitiesListener;
@@ -99,6 +100,8 @@ public class EntitiesPlugin : Plugin
         {
             _authPlugin.ClientAccepted += OnClientAcceptedHandler;
         }
+
+        _spawnsPlugin = Plugins.Get<SpawnsPlugin>();
     }
 
     public void CreateClientEntity(Vector3 position, string prefabId)
@@ -189,12 +192,17 @@ public class EntitiesPlugin : Plugin
 
     private void OnClientAcceptedHandler()
     {
+        if (_spawnsPlugin == null)
+        {
+            return;
+        }
+
         ClientController.SendNetworkEvent(new PlayerPullEntitiesEvent
         {
             UserId = ClientController.UserId
         });
 
-        CreateClientEntity(Vector3.zero, "ClientEntity");
+        CreateClientEntity(_spawnsPlugin.Use(), "ClientEntity");
     }
 
     private void OnPlayerPullEntitiesHandler(PlayerPullEntitiesEvent @event)

@@ -27,6 +27,7 @@ public class Boostrap : MonoBehaviour
         Plugins.Add(new ChatPlugin());
         Plugins.Add(new ControllerPlugin());
         Plugins.Add(new EntitiesPlugin());
+        Plugins.Add(new SpawnsPlugin());
 
         if (Plugins.ServerController != null)
         {
