@@ -5,6 +5,7 @@ public class Boostrap : MonoBehaviour
     private void Awake()
     {
         EventsActions.Init();
+        Entities.Init();
     }
 
     private void Start()
@@ -25,6 +26,7 @@ public class Boostrap : MonoBehaviour
         Plugins.Add(new ServerClientsPlugin());
         Plugins.Add(new ChatPlugin());
         Plugins.Add(new ControllerPlugin());
+        Plugins.Add(new EntitiesPlugin());
 
         if (Plugins.ServerController != null)
         {
